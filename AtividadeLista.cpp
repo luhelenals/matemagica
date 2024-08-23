@@ -93,6 +93,9 @@ int main(void)
     glBindVertexArray(0);
 
     glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
+    
+    std::vector<float> frozenPoints;
+    float currentAngle = 0.0f;
 
     bool bouncing = true;
     bool spinning = false;
@@ -111,6 +114,8 @@ int main(void)
             0.0f,  0.42f,  0.0f,     1.0f, 1.0f, 0.0f, // Top point
         };
 
+        frozenPoints.resize(points.size(), 0.0f);
+
         float currentTime = glfwGetTime();
         float elapsedTime = currentTime - stateStartTime;
 
@@ -126,16 +131,24 @@ int main(void)
             break;
 
         case SPINNING:
+            points = frozenPoints;
             Spin(points, elapsedTime);
-            if (elapsedTime >= 6.0f) // Spin for 6 seconds
+            if (elapsedTime >= 3.0f) // Spin for 6 seconds
             {
+                frozenPoints = points;
                 currentState = IDLE;
-                stateStartTime = currentTime; // Reset start time for bouncing
+                stateStartTime = currentTime; // Reset start time
             }
             break;
 
         case IDLE:
-            // No action or additional behavior
+            // Use the stored positions, effectively freezing the star
+            points = frozenPoints;
+            if (elapsedTime >= 2.0f) 
+            {
+                currentState = SPINNING;
+                stateStartTime = currentTime; // Reset start time
+            }
             break;
         }
 
@@ -167,15 +180,23 @@ void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool&
     }
 }
 
-void Spin(std::vector<float>& points, float elapsedTime)
-{
-    float angle = (elapsedTime * -30.0f); // Spinning speed
+void Spin(std::vector<float>& points, float elapsedTime) {
+    // Define the spinning speed (degrees per second)
+    const float spinSpeed = -30.0f;
+
+    // Calculate the angle for this frame based on spinSpeed and elapsedTime
+    float angle = spinSpeed * elapsedTime;
+
+    // Limit the angle to a specific range to avoid overflow and excessive spin speed
+    if (angle > 360.0f) {
+        angle = fmod(angle, 360.0f);
+    }
 
     // Rotation matrix for rotating around the z-axis
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Movement in the x-axis
-    float moveX = glm::sin(elapsedTime * 0.3f); // Use sin for smoother movement
+    float moveX = glm::sin(elapsedTime * 0.3f); // Smooth x-axis movement
 
     // Translation matrix to move the star in the x direction
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(moveX, 0.0f, 0.0f));
@@ -184,8 +205,7 @@ void Spin(std::vector<float>& points, float elapsedTime)
     glm::mat4 transform = translation * rotation;
 
     // Apply transformation to each vertex
-    for (int i = 0; i < points.size(); i += 6)
-    {
+    for (int i = 0; i < points.size(); i += 6) {
         glm::vec4 pos = glm::vec4(points[i], points[i + 1], 0.0f, 1.0f); // z-coordinate is 0.0f
         pos = transform * pos; // Apply transformation
         points[i] = pos.x;
