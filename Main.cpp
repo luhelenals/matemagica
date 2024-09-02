@@ -20,6 +20,8 @@ const float PI = 3.14159265358979f;
 
 void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool& spinning, float& startTime);
 void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::vec3(center));
+void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2);
+void DrawDetachedLines(GLuint& linesVBO, GLuint& linesVAO, GLuint shader, const std::vector<float>& detachedLinesPoints);
 void Rotate(std::vector<float>& object1, std::vector<float>& object2, float elapsedTime, glm::vec3 center1, glm::vec3 center2);
 bool initOpenGL();
 std::vector<float> generatePentagram(float radius, glm::vec2 center);
@@ -44,6 +46,7 @@ enum State {
 
 State currentState = BOUNCING; // Start with bouncing
 float stateStartTime = glfwGetTime(); // Track when the current state started
+std::vector<float> detachedLinesPoints;
 
 int main(void)
 {
@@ -64,6 +67,10 @@ int main(void)
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+
+    GLuint linesVBO, linesVAO;
+    glGenBuffers(1, &linesVBO);
+    glGenVertexArrays(1, &linesVAO);
         
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -84,9 +91,11 @@ int main(void)
     bool spinning = false;
     bool hasSpinned = false;
     bool spinningForward = true;
-
+    
+    std::vector<float> actualPoints;
     std::vector<float> frozenPoints;
     std::vector<float> rectangle;
+    std::vector<float> line;
 
     while (!glfwWindowShouldClose(gWindow))
     {
@@ -99,7 +108,6 @@ int main(void)
         std::vector<float> triangle2 = ChangeColor(triangleDC1, 3, 0.7890625f, 0.01953125f, 0.453125f);
         std::vector<float> l1, l2, l3;
         std::tie(l1, l2, l3) = GetTriangleLines(triangleDC1);
-        
 
         float currentTime = glfwGetTime();
         float elapsedTime = currentTime - stateStartTime;
@@ -108,13 +116,14 @@ int main(void)
         {
         case BOUNCING:
             Bounce(points, elapsedTime, bouncing, spinning, stateStartTime);
-            if (elapsedTime >= 0.8f) // Bounce for 5 seconds
+            if (elapsedTime >= 4.7f) // Bounce for 5 seconds
             {
                 if (hasSpinned) {
                     currentState = ROTATING;
                     stateStartTime = currentTime; // Reset start time
                 }
                 else {
+                    //frozenPoints = points;
                     currentState = SPINNING;
                     stateStartTime = currentTime; // Reset start time
                 }
@@ -125,26 +134,43 @@ int main(void)
             break;
 
         case SPINNING:
-            if (spinningForward)
-                Spin(points, elapsedTime, 1.0f, CalculateCenter(points));
-            else {
-                //points = frozenPoints;
-                Spin(points, elapsedTime, -1.0f, CalculateCenter(frozenPoints));
-            }
-
+            glm::vec3 center = CalculateCenter(points);
+            Spin(points, elapsedTime, (spinningForward ? 1.0f : -1.0f), (spinningForward ? center : CalculateCenter(actualPoints)));
             if (elapsedTime >= 10.0f && !spinningForward) // Spin for 6 seconds
             {
                 currentState = ROTATING;
                 stateStartTime = currentTime; // Reset start time
                 hasSpinned = true;
             }
-            else if (abs(points[0] - points[6] < 0.001) && spinningForward)
+            else if (abs(points[12] - points[18] <= 0.001) && spinningForward)
             {
+                actualPoints = points;
                 currentState = IDLE;
-                frozenPoints = points;
                 spinningForward = false;
                 stateStartTime = currentTime;
             }
+
+            if (abs(points[0] - points[6]) <= 0.001 && points[0] > 0.4 && !spinningForward && detachedLinesPoints.size() < 12)
+            {
+                CreateDetachingLines(points, 0, 6, points[1], points[7]);
+            }
+
+            if (abs(points[12] - points[18]) <= 0.001 && points[0] > 0.0 && points[0] < 0.5  && !spinningForward && detachedLinesPoints.size() < 24)
+            {
+                CreateDetachingLines(points, 12, 18, triangleDC1[7], points[13]);
+            }
+
+            if (abs(points[24] - points[0]) <= 0.001 && points[0] > -0.5 && !spinningForward && detachedLinesPoints.size() < 36)
+            {
+                CreateDetachingLines(points, 24, 0, triangleAB2[13], points[25]);
+            }
+
+            if (abs(points[6] - points[12]) <= 0.001 && points[0] < -0.0 && !spinningForward && detachedLinesPoints.size() < 48)
+            {
+                CreateDetachingLines(points, 6, 12, triangleAB2[13], triangleDC1[7]);
+            }
+            
+            DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
             DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
             break;
 
@@ -246,7 +272,13 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
     direction = (direction < 0) ? -1.0f : 1.0f;
 
     // Calculate the rotation angle based on the direction
+    
     float angle = elapsedTime * direction * -50.0f; // Spinning speed with direction
+   
+    if (direction == -1) {
+        angle += 198;
+        if (angle >= 360) angle -= 360;
+    }
 
     // Apply rotation around the z-axis (ensuring no unintended z-axis movement)
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -270,6 +302,44 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
     }
 }
 
+void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2)
+{
+    std::cout << "Entrou" << points[0] << std::endl;
+    // Only create a line after enough time has passed.
+    if (detachedLinesPoints.size() < 30 * 6) // Assume 5 lines with 6 vertices each
+    {
+        // Create a vertical line segment at the star's current position.
+        detachedLinesPoints.insert(detachedLinesPoints.end(),
+            {
+                points[point1], y1, 0.0f, 1.0f, 1.0f, 1.0f, // First vertex of the line
+                points[point2], y2, 0.0f, 1.0f, 1.0f, 1.0f  // Second vertex of the line
+            });
+    }
+}
+
+void DrawDetachedLines(GLuint& linesVBO, GLuint& linesVAO, GLuint shader, const std::vector<float>& detachedLinesPoints)
+{
+    // Bind the VBO and update it with the current line points.
+    glBindBuffer(GL_ARRAY_BUFFER, linesVBO);
+    glBufferData(GL_ARRAY_BUFFER, detachedLinesPoints.size() * sizeof(float), detachedLinesPoints.data(), GL_DYNAMIC_DRAW);
+
+    // Use the provided shader.
+    glUseProgram(shader);
+
+    // Bind the VAO and set up the vertex attributes for the line data.
+    glBindVertexArray(linesVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // Position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); // Color
+    glEnableVertexAttribArray(1);
+
+    // Draw the detached lines.
+    glDrawArrays(GL_LINES, 0, detachedLinesPoints.size() / 6);
+
+    // Unbind VAO and shader program after drawing.
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
 
 void Rotate(std::vector<float>& object1, std::vector<float>& object2, float elapsedTime, glm::vec3 center1, glm::vec3 center2) {
     float angleDegrees = elapsedTime * -40.0f;
