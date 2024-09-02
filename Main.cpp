@@ -22,6 +22,7 @@ void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool&
 void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::vec3(center));
 void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2);
 void DrawDetachedLines(GLuint& linesVBO, GLuint& linesVAO, GLuint shader, const std::vector<float>& detachedLinesPoints);
+void MoveLineToPosition(std::vector<float>& detachedLinesPoints, int i, float targetX1, float targetX2, float targetY1, float targetY2, float step);
 void Rotate(std::vector<float>& object1, std::vector<float>& object2, float elapsedTime, glm::vec3 center1, glm::vec3 center2);
 bool initOpenGL();
 std::vector<float> generatePentagram(float radius, glm::vec2 center);
@@ -37,6 +38,7 @@ enum State {
     SPINNING,
     BOUNCING,
     IDLE,
+    LINES,
     ROTATING,
     MAKINGRECTANGLE,
     RECTANGLE,
@@ -91,6 +93,7 @@ int main(void)
     bool spinning = false;
     bool hasSpinned = false;
     bool spinningForward = true;
+    float step = 0.0015f;
     
     std::vector<float> actualPoints;
     std::vector<float> frozenPoints;
@@ -138,7 +141,7 @@ int main(void)
             Spin(points, elapsedTime, (spinningForward ? 1.0f : -1.0f), (spinningForward ? center : CalculateCenter(actualPoints)));
             if (elapsedTime >= 10.0f && !spinningForward) // Spin for 6 seconds
             {
-                currentState = ROTATING;
+                currentState = LINES;
                 stateStartTime = currentTime; // Reset start time
                 hasSpinned = true;
             }
@@ -168,8 +171,7 @@ int main(void)
             if (abs(points[6] - points[12]) <= 0.001 && points[0] < -0.0 && !spinningForward && detachedLinesPoints.size() < 48)
             {
                 CreateDetachingLines(points, 6, 12, triangleAB2[13], triangleDC1[7]);
-            }
-            
+            }            
             DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
             DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
             break;
@@ -181,6 +183,83 @@ int main(void)
                 stateStartTime = currentTime; // Reset start time
             }
             DrawShape(vbo, vao, shader, frozenPoints, GL_LINE_LOOP, 6);
+            break;
+
+        case LINES:
+            if (elapsedTime < 5.0f) {
+                MoveLineToPosition(detachedLinesPoints, 36, detachedLinesPoints[36], detachedLinesPoints[36], detachedLinesPoints[1], detachedLinesPoints[42] / 2 + 0.02, step);
+            }
+            if (abs(detachedLinesPoints[37] - detachedLinesPoints[1]) <= 0.001 && detachedLinesPoints.size() < 60) {
+                CreateDetachingLines(detachedLinesPoints, 36, 42, detachedLinesPoints[37], detachedLinesPoints[43]);
+            }
+            if (elapsedTime > 3.0f && elapsedTime < 5.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[24], detachedLinesPoints[24], detachedLinesPoints[25], detachedLinesPoints[13], step);
+                frozenPoints = detachedLinesPoints;
+            }
+            if (elapsedTime > 5.0f && elapsedTime < 7.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12] - 0.02, detachedLinesPoints[12] - 0.02, detachedLinesPoints[49], detachedLinesPoints[55], step);
+                MoveLineToPosition(detachedLinesPoints, 24, detachedLinesPoints[12] - 0.02, detachedLinesPoints[12] - 0.02, detachedLinesPoints[25], detachedLinesPoints[31], step);
+            }
+            if (elapsedTime > 7.0f && elapsedTime < 9.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[48], frozenPoints[48], detachedLinesPoints[49], detachedLinesPoints[55], step);
+                MoveLineToPosition(detachedLinesPoints, 24, frozenPoints[24], frozenPoints[24], detachedLinesPoints[25], detachedLinesPoints[31], step);
+            }
+            if (elapsedTime > 9.0f && elapsedTime < 10.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[24], frozenPoints[24], detachedLinesPoints[25], detachedLinesPoints[31], 1);
+            }
+            if (elapsedTime > 10.0f && elapsedTime < 12.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12], detachedLinesPoints[12], detachedLinesPoints[7], detachedLinesPoints[13], step);
+                frozenPoints = detachedLinesPoints;
+            }
+            if (elapsedTime > 12.0f && elapsedTime < 14.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[0] - 0.02, detachedLinesPoints[0] - 0.02, detachedLinesPoints[49], detachedLinesPoints[55], step);
+                MoveLineToPosition(detachedLinesPoints, 12, detachedLinesPoints[0] - 0.02, detachedLinesPoints[0] - 0.02, detachedLinesPoints[13], detachedLinesPoints[19], step);
+            }
+            if (elapsedTime > 14.0f && elapsedTime < 16.0f) {
+                MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[48], frozenPoints[48], detachedLinesPoints[49], detachedLinesPoints[55], step);
+                MoveLineToPosition(detachedLinesPoints, 12, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], step);
+            }
+            if (elapsedTime > 16.0f && detachedLinesPoints.size() < 72) {
+                MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], 1);
+                CreateDetachingLines(detachedLinesPoints, 0, 6, detachedLinesPoints[1], detachedLinesPoints[7]);
+            } 
+            if (elapsedTime > 16.1f && detachedLinesPoints.size() < 84) CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
+            if (elapsedTime > 16.2f && detachedLinesPoints.size() < 96) CreateDetachingLines(detachedLinesPoints, 12, 18, detachedLinesPoints[13], detachedLinesPoints[19]);
+            if (elapsedTime > 16.3f && detachedLinesPoints.size() < 108) CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
+            if (elapsedTime > 16.4f) {
+                step = 0.001;
+
+                glm::vec2 a(points[0], points[1]);
+                glm::vec2 b(points[6], points[7]);
+                glm::vec2 c(points[12], points[13]);
+                glm::vec2 d(points[18], points[19]);
+                glm::vec2 e(points[24], points[25]);
+
+                glm::vec2 intersection4 = GetIntersectionPoint(d, c, a, e);
+                glm::vec2 intersection5 = GetIntersectionPoint(b, a, d, c);
+
+                MoveLineToPosition(detachedLinesPoints, 0, points[6], points[12], points[7], points[13], step);
+                MoveLineToPosition(detachedLinesPoints, 12, points[0], intersection4[0], points[1], intersection4[1], step);
+                MoveLineToPosition(detachedLinesPoints, 24, points[18], triangleAE3[12], points[19], triangleAE3[13], step);
+                MoveLineToPosition(detachedLinesPoints, 36, triangleAE3[12], intersection5[0], triangleAE3[13], intersection5[1], step);
+                MoveLineToPosition(detachedLinesPoints, 48, triangleAE3[12], points[24], triangleAE3[13], points[25], step);
+                MoveLineToPosition(detachedLinesPoints, 60, points[18], points[12], points[19], points[13], step);
+                MoveLineToPosition(detachedLinesPoints, 72, triangleAE3[12], points[6], triangleAE3[13], points[7], step);
+                MoveLineToPosition(detachedLinesPoints, 84, intersection4[0], points[24], intersection4[1], points[25], step);
+                MoveLineToPosition(detachedLinesPoints, 96, points[0], intersection5[0], points[1], intersection5[1], step);
+            }
+            if (elapsedTime < 22.0f) {
+                DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
+            }
+            else if(elapsedTime < 26.7f){
+                Bounce(points, elapsedTime, bouncing, spinning, stateStartTime);
+                DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
+                
+            }
+            else {
+                currentState = ROTATING;
+                stateStartTime = currentTime;
+            }
             break;
 
         case ROTATING:
@@ -304,7 +383,6 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
 
 void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2)
 {
-    std::cout << "Entrou" << points[0] << std::endl;
     // Only create a line after enough time has passed.
     if (detachedLinesPoints.size() < 30 * 6) // Assume 5 lines with 6 vertices each
     {
@@ -339,6 +417,23 @@ void DrawDetachedLines(GLuint& linesVBO, GLuint& linesVAO, GLuint shader, const 
     // Unbind VAO and shader program after drawing.
     glBindVertexArray(0);
     glUseProgram(0);
+}
+
+void MoveLineToPosition(std::vector<float>& detachedLinesPoints, int i,
+    float targetX1, float targetX2, float targetY1, float targetY2,
+    float step)
+{
+    // Calculate the distance to move on each axis for the first point
+    float deltaX1 = (targetX1 - detachedLinesPoints[i]) * step;
+    float deltaY1 = (targetY1 - detachedLinesPoints[i + 1]) * step;
+    float deltaX2 = (targetX2 - detachedLinesPoints[i + 6]) * step;
+    float deltaY2 = (targetY2 - detachedLinesPoints[i + 7]) * step;
+
+    // Update the line's position incrementally
+    detachedLinesPoints[i] += deltaX1;     // Update X1
+    detachedLinesPoints[i + 1] += deltaY1; // Update Y1
+    detachedLinesPoints[i + 6] += deltaX2; // Update X2
+    detachedLinesPoints[i + 7] += deltaY2; // Update Y2
 }
 
 void Rotate(std::vector<float>& object1, std::vector<float>& object2, float elapsedTime, glm::vec3 center1, glm::vec3 center2) {
