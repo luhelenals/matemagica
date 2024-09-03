@@ -18,6 +18,32 @@ const char* TITLE = { "Matemagica" };
 GLFWwindow* gWindow = NULL;
 const float PI = 3.14159265358979f;
 
+enum State {
+    SPINNING,
+    BOUNCING,
+    IDLE,
+    LINES,
+    ROTATING,
+    MAKINGRECTANGLE,
+    RECTANGLE,
+    CHANGINGCOLOR,
+    TRIANGLE,
+    MAKINGTRIANGLE,
+    STOPPED,
+    PENTAGON
+};
+
+enum Color {
+    YELLOW,
+    LIGHTPINK,
+    PINK,
+    LIGHTORANGE,
+    ORANGE,
+    DARKORANGE,
+    LIGHTBLUE,
+    BLUE
+};
+
 void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool& spinning, float& startTime);
 void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::vec3(center));
 void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2);
@@ -29,22 +55,12 @@ std::vector<float> generatePentagram(float radius, glm::vec2 center);
 glm::vec2 GetIntersectionPoint(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d);
 std::tuple<std::vector<float>, std::vector<float>, std::vector<float>> GetTriangles(std::vector<float>& points);
 void DrawShape(unsigned int vbo, unsigned int vao, unsigned int shader, std::vector<float>& points, int mode, int count);
-std::vector<float> ChangeColor(std::vector<float> points, int nVertex, float r, float g, float b);
-std::tuple<std::vector<float>, std::vector<float>, std::vector<float>> GetTriangleLines(std::vector<float>& points); 
+std::vector<float> ChangeColor(std::vector<float> points, Color color);
+std::tuple<std::vector<float>, std::vector<float>, std::vector<float>> GetTriangleLines(std::vector<float>& points);
 std::vector<float> GenerateRectangle(std::vector<float> l1, std::vector<float> l2, std::vector<float> l3);
 glm::vec3 CalculateCenter(const std::vector<float>& vertices);
-
-enum State {
-    SPINNING,
-    BOUNCING,
-    IDLE,
-    LINES,
-    ROTATING,
-    MAKINGRECTANGLE,
-    RECTANGLE,
-    TRIANGLE,
-    STOPPED
-};
+void ScaleObject(std::vector<float>& vertices, float elapsedTime);
+std::vector<float> GeneratePentagon(std::vector<float> points);
 
 State currentState = BOUNCING; // Start with bouncing
 float stateStartTime = glfwGetTime(); // Track when the current state started
@@ -59,8 +75,6 @@ int main(void)
     }
     float lineWidthRange[2];
     glGetFloatv(GL_LINE_WIDTH_RANGE, lineWidthRange);
-    std::cout << "Supported line width range: " << lineWidthRange[0] << " - " << lineWidthRange[1] << std::endl;
-
 
     ShaderProgramSource source = ParseShader("res/shaders/star.shader");
     unsigned int shader = createShader(source.VertexSource, source.FragmentSource, source.GeometrySource);
@@ -73,7 +87,7 @@ int main(void)
     GLuint linesVBO, linesVAO;
     glGenBuffers(1, &linesVBO);
     glGenVertexArrays(1, &linesVAO);
-        
+
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -93,12 +107,29 @@ int main(void)
     bool spinning = false;
     bool hasSpinned = false;
     bool spinningForward = true;
+    bool hasRectangled = false;
+    bool hasStarred = false;
+    bool condition = true;
     float step = 0.0015f;
-    
+    int i = 1;
+
     std::vector<float> actualPoints;
     std::vector<float> frozenPoints;
     std::vector<float> rectangle;
     std::vector<float> line;
+    std::vector<float> l1, l2, l3, line1, line2, line3;
+    std::vector<float> triangleDC1, triangleAB2, triangleAE3;
+    std::vector<float> pentagon;
+    pentagon.resize(30);
+    line1.resize(12);
+    line2.resize(12);
+    line3.resize(12);
+    l1.resize(12);           // Agora l1 tem 12 elementos com valor 0.0f
+    l2.resize(12);           // Agora l2 tem 12 elementos com valor 0.0f
+    l3.resize(12);           // Agora l3 tem 12 elementos com valor 0.0f
+    triangleDC1.resize(18);  // Agora triangleDC1 tem 18 elementos com valor 0.0f
+    triangleAB2.resize(18);  // Agora triangleAB2 tem 18 elementos com valor 0.0f
+    triangleAE3.resize(18);  // Agora triangleAE3 tem 18 elementos com valor 0.0f*/
 
     while (!glfwWindowShouldClose(gWindow))
     {
@@ -106,33 +137,59 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         std::vector<float> points = generatePentagram(0.3f, glm::vec2(0.0f, 0.0f));
-        std::vector<float> triangleDC1, triangleAB2, triangleAE3;
+        if (hasRectangled)
+            pentagon = GeneratePentagon(points);
+        std::vector<float> triangle2 = ChangeColor(triangleDC1, PINK);
+        if (!hasRectangled)
+            std::tie(l1, l2, l3) = GetTriangleLines(triangleDC1);
+        else {
+            l1 = line1;
+            l2 = line2;
+            l3 = line3;
+        }
+
         std::tie(triangleDC1, triangleAB2, triangleAE3) = GetTriangles(points);
-        std::vector<float> triangle2 = ChangeColor(triangleDC1, 3, 0.7890625f, 0.01953125f, 0.453125f);
-        std::vector<float> l1, l2, l3;
-        std::tie(l1, l2, l3) = GetTriangleLines(triangleDC1);
+        std::vector<float> t1 = triangleDC1, t2 = triangleDC1, t3 = triangleDC1;
 
         float currentTime = glfwGetTime();
         float elapsedTime = currentTime - stateStartTime;
 
-        switch (currentState)
-        {
+        switch (currentState) {
         case BOUNCING:
             Bounce(points, elapsedTime, bouncing, spinning, stateStartTime);
+            if (hasRectangled)
+            {
+                Bounce(triangleAB2, elapsedTime, bouncing, spinning, stateStartTime);
+                Bounce(triangleDC1, elapsedTime, bouncing, spinning, stateStartTime);
+                Bounce(triangleAE3, elapsedTime, bouncing, spinning, stateStartTime);
+            }
             if (elapsedTime >= 4.7f) // Bounce for 5 seconds
             {
-                if (hasSpinned) {
+                std::cout << "State: BOUNCING" << std::endl;
+                if (hasSpinned && !hasRectangled)
                     currentState = ROTATING;
-                    stateStartTime = currentTime; // Reset start time
-                }
-                else {
-                    //frozenPoints = points;
+
+                else if (!hasSpinned)
                     currentState = SPINNING;
-                    stateStartTime = currentTime; // Reset start time
-                }
+
+                else if (hasSpinned && hasRectangled)
+                    currentState = PENTAGON;
+
+                stateStartTime = currentTime; // Reset start time
             }
-            if (hasSpinned)
-                points = ChangeColor(points, 5, 1.0f, 0.21484375f, 0.62890625f);
+            if (hasSpinned && !hasRectangled)
+                points = ChangeColor(points, LIGHTPINK);
+            else if (hasRectangled)
+            {
+                points = ChangeColor(points, LIGHTBLUE);
+                triangleAB2 = ChangeColor(triangleAB2, BLUE);
+                triangleDC1 = ChangeColor(triangleDC1, BLUE);
+                triangleAE3 = ChangeColor(triangleAE3, BLUE);
+
+                DrawShape(vbo, vao, shader, triangleAB2, GL_TRIANGLES, 6);
+                DrawShape(vbo, vao, shader, triangleDC1, GL_TRIANGLES, 6);
+                DrawShape(vbo, vao, shader, triangleAE3, GL_TRIANGLES, 6);
+            }
             DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
             break;
 
@@ -158,7 +215,7 @@ int main(void)
                 CreateDetachingLines(points, 0, 6, points[1], points[7]);
             }
 
-            if (abs(points[12] - points[18]) <= 0.001 && points[0] > 0.0 && points[0] < 0.5  && !spinningForward && detachedLinesPoints.size() < 24)
+            if (abs(points[12] - points[18]) <= 0.001 && points[0] > 0.0 && points[0] < 0.5 && !spinningForward && detachedLinesPoints.size() < 24)
             {
                 CreateDetachingLines(points, 12, 18, triangleDC1[7], points[13]);
             }
@@ -171,7 +228,7 @@ int main(void)
             if (abs(points[6] - points[12]) <= 0.001 && points[0] < -0.0 && !spinningForward && detachedLinesPoints.size() < 48)
             {
                 CreateDetachingLines(points, 6, 12, triangleAB2[13], triangleDC1[7]);
-            }            
+            }
             DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
             DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
             break;
@@ -179,13 +236,35 @@ int main(void)
         case IDLE:
             if (elapsedTime >= 1.0f)// 2.0f) // Stay put seconds
             {
+                std::cout << "State: IDLE" << std::endl;
                 currentState = SPINNING;
                 stateStartTime = currentTime; // Reset start time
+
+                std::cout << "Points:" << std::endl;
+                std::cout << points[0] << ", " << points[1] << std::endl;
+                std::cout << points[6] << ", " << points[7] << std::endl;
+                std::cout << points[12] << ", " << points[13] << std::endl;
+                std::cout << points[18] << ", " << points[19] << std::endl;
+                std::cout << points[24] << ", " << points[20] << "\n" << std::endl;
             }
-            DrawShape(vbo, vao, shader, frozenPoints, GL_LINE_LOOP, 6);
+            if (hasRectangled)
+            {
+                points = ChangeColor(points, LIGHTBLUE);
+                triangleAB2 = ChangeColor(triangleAB2, BLUE);
+                triangleDC1 = ChangeColor(triangleDC1, BLUE);
+                triangleAE3 = ChangeColor(triangleAE3, BLUE);
+
+                DrawShape(vbo, vao, shader, triangleAB2, GL_TRIANGLES, 6);
+                DrawShape(vbo, vao, shader, triangleDC1, GL_TRIANGLES, 6);
+                DrawShape(vbo, vao, shader, triangleAE3, GL_TRIANGLES, 6);
+
+                currentState = BOUNCING;
+            }
+            DrawShape(vbo, vao, shader, actualPoints, GL_LINE_LOOP, 6);
             break;
 
         case LINES:
+            step = 0.0017;
             if (elapsedTime < 5.0f) {
                 MoveLineToPosition(detachedLinesPoints, 36, detachedLinesPoints[36], detachedLinesPoints[36], detachedLinesPoints[1], detachedLinesPoints[42] / 2 + 0.02, step);
             }
@@ -222,7 +301,7 @@ int main(void)
             if (elapsedTime > 16.0f && detachedLinesPoints.size() < 72) {
                 MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], 1);
                 CreateDetachingLines(detachedLinesPoints, 0, 6, detachedLinesPoints[1], detachedLinesPoints[7]);
-            } 
+            }
             if (elapsedTime > 16.1f && detachedLinesPoints.size() < 84) CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
             if (elapsedTime > 16.2f && detachedLinesPoints.size() < 96) CreateDetachingLines(detachedLinesPoints, 12, 18, detachedLinesPoints[13], detachedLinesPoints[19]);
             if (elapsedTime > 16.3f && detachedLinesPoints.size() < 108) CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
@@ -251,10 +330,10 @@ int main(void)
             if (elapsedTime < 22.0f) {
                 DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
             }
-            else if(elapsedTime < 26.7f){
+            else if (elapsedTime < 26.7f) {
                 Bounce(points, elapsedTime, bouncing, spinning, stateStartTime);
                 DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
-                
+
             }
             else {
                 currentState = ROTATING;
@@ -263,63 +342,152 @@ int main(void)
             break;
 
         case ROTATING:
-            Rotate(triangleAE3, triangleAB2, elapsedTime, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-            if (abs(triangleAE3[12] - triangleAB2[12]) < 0.001f && abs(triangleAE3[13] - triangleAB2[13]) < 0.001f)
+            if (!hasRectangled) Rotate(triangleAE3, triangleAB2, elapsedTime, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+            else {
+                t1 = ChangeColor(t1, LIGHTBLUE);
+                t2 = ChangeColor(t2, LIGHTBLUE);
+                t3 = ChangeColor(t3, LIGHTBLUE);
+                Rotate(t3, t2, elapsedTime, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+                triangle2 = ChangeColor(triangle2, BLUE);
+                DrawShape(vbo, vao, shader, triangle2, GL_TRIANGLES, 3);
+            }
+
+            condition = hasRectangled
+                ? (abs(points[0] - t3[6]) < 0.001f) && (abs(points[1] - t3[7]) < 0.001f)
+                : (abs(triangleAE3[12] - triangleAB2[12]) < 0.001f && abs(triangleAE3[13] - triangleAB2[13]) < 0.001f);
+
+            if (condition)
             {
-                currentState = TRIANGLE;
+                std::cout << "State: ROTATING" << std::endl;
+                currentState = hasRectangled ? IDLE : TRIANGLE;
+                if (hasRectangled) hasStarred = true;
                 stateStartTime = currentTime; // Reset start time
             }
-            
-            DrawShape(vbo, vao, shader, triangleDC1, GL_LINE_LOOP, 3);
-            DrawShape(vbo, vao, shader, triangleAB2, GL_LINE_LOOP, 3);
-            DrawShape(vbo, vao, shader, triangleAE3, GL_LINE_LOOP, 3);
 
+            if (!hasRectangled) {
+                DrawShape(vbo, vao, shader, triangleDC1, GL_LINE_LOOP, 3);
+                DrawShape(vbo, vao, shader, triangleAB2, GL_LINE_LOOP, 3);
+                DrawShape(vbo, vao, shader, triangleAE3, GL_LINE_LOOP, 3);
+            }
+            else {
+                DrawShape(vbo, vao, shader, t1, GL_LINE_LOOP, 3);
+                DrawShape(vbo, vao, shader, t2, GL_LINE_LOOP, 3);
+                DrawShape(vbo, vao, shader, t3, GL_LINE_LOOP, 3);
+            }
             break;
 
         case TRIANGLE:
-            if (elapsedTime >= 1.0f){//1.0f) {// Stay put seconds
-                
-                DrawShape(vbo, vao, shader, triangle2, GL_TRIANGLES, 3);
-                DrawShape(vbo, vao, shader, triangleDC1, GL_LINE_LOOP, 3);
+            if (hasRectangled) triangleDC1 = ChangeColor(triangleDC1, LIGHTORANGE);
 
-                if (elapsedTime >= 3.0f) {
-                    currentState = MAKINGRECTANGLE;
-                    stateStartTime = currentTime; // Reset start time
+            if (elapsedTime >= 1.0f) {// Stay put seconds
+                if (hasRectangled)
+                {
+                    triangle2 = ChangeColor(triangle2, BLUE);
+                    triangleDC1 = ChangeColor(triangleDC1, LIGHTBLUE);
                 }
-            } else {
-                DrawShape(vbo, vao, shader, triangleDC1, GL_LINE_LOOP, 3);
+                DrawShape(vbo, vao, shader, triangle2, GL_TRIANGLES, 3);
+
+                if (elapsedTime >= 2.0f) {
+                    std::cout << "State: TRIANGLE" << std::endl;
+                    currentState = hasRectangled ? ROTATING : MAKINGRECTANGLE;
+                    stateStartTime = currentTime;
+
+                    std::cout << "t2: " << std::endl;
+                    std::cout << t2[0] << ", " << t2[1] << std::endl;
+                    std::cout << t2[6] << ", " << t2[7] << std::endl;
+                    std::cout << t2[12] << ", " << t2[13] << std::endl;
+
+                    std::cout << "t3: " << std::endl;
+                    std::cout << t3[0] << ", " << t3[1] << std::endl;
+                    std::cout << t3[6] << ", " << t3[7] << std::endl;
+                    std::cout << t3[12] << ", " << t3[13] << std::endl;
+
+                    std::cout << "\n" << std::endl;
+                }
             }
+
+            DrawShape(vbo, vao, shader, triangleDC1, GL_LINE_LOOP, 3);
+
             break;
 
         case MAKINGRECTANGLE:
             DrawShape(vbo, vao, shader, triangle2, GL_TRIANGLES, 3);
+
             Rotate(l3, l2, elapsedTime, glm::vec3(l3[0], l3[1], l3[2]), glm::vec3(l2[0], l2[1], l2[2]));
+
             if (abs(l1[0] - l2[6]) < 0.001f && abs(l1[6] - l3[6]) < 0.001f) {
+                std::cout << "State: MAKINGRECTANGLE" << std::endl;
                 currentState = RECTANGLE;
-                stateStartTime = currentTime;   
+                stateStartTime = currentTime;
                 rectangle = GenerateRectangle(l1, l2, l3);
+                hasRectangled = true;
+                line1 = ChangeColor(l1, LIGHTORANGE);
+                line2 = ChangeColor(l2, LIGHTORANGE);
+                line3 = ChangeColor(l3, LIGHTORANGE);
             }
             DrawShape(vbo, vao, shader, l1, GL_LINES, 2);
             DrawShape(vbo, vao, shader, l2, GL_LINES, 2);
             DrawShape(vbo, vao, shader, l3, GL_LINES, 2);
             break;
 
-        case RECTANGLE:            
+        case RECTANGLE:
             if (elapsedTime > 0.5f) {
-                rectangle = ChangeColor(rectangle, 6, 1.0f, 0.658823f, 0.490196f);
+                rectangle = ChangeColor(rectangle, LIGHTORANGE);
                 std::vector<float> rectangle2 = rectangle;
-                rectangle2 = ChangeColor(rectangle2, 6, 0.741176f, 0.1215686f, 0.0f);
+
+                if (i % 300)
+                    rectangle2 = ChangeColor(rectangle2, DARKORANGE);
+                else
+                    rectangle2 = ChangeColor(rectangle2, ORANGE);
+
+                i++;
+
                 DrawShape(vbo, vao, shader, rectangle2, GL_TRIANGLES, 6);
                 if (elapsedTime > 5.0f) {
-                    currentState = STOPPED;
+                    i = 1;
+                    std::cout << "State: RECTANGLE" << std::endl;
+
+                    std::cout << "l2: " << std::endl;
+
+                    std::cout << l2[6] << ", " << l2[7] << std::endl;
+                    std::cout << "l3: " << std::endl;
+
+                    std::cout << l3[6] << ", " << l3[7] << "/n" << std::endl;
+
+                    currentState = MAKINGTRIANGLE;
                     stateStartTime = currentTime;
+
                 }
             }
             else DrawShape(vbo, vao, shader, triangle2, GL_TRIANGLES, 3);
-    
+
             DrawShape(vbo, vao, shader, rectangle, GL_LINE_LOOP, 6);
+            break;
+
+        case MAKINGTRIANGLE:
+            Rotate(l2, l3, elapsedTime, glm::vec3(l2[0], l2[1], l2[2]), glm::vec3(l3[0], l3[1], l3[2]));
+            if (abs(l3[6] - l2[6]) < 0.01f && abs(l2[7] - l3[7]) < 0.01f && elapsedTime > 0.2f) {
+                currentState = TRIANGLE;
+                stateStartTime = currentTime;
+            }
+
+            DrawShape(vbo, vao, shader, l1, GL_LINES, 2);
+            DrawShape(vbo, vao, shader, l2, GL_LINES, 2);
+            DrawShape(vbo, vao, shader, l3, GL_LINES, 2);
+
+            break;
+
+        case PENTAGON:
+            ScaleObject(points, elapsedTime);
+            DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
+            if (elapsedTime > 2.0f) {
+                DrawShape(vbo, vao, shader, pentagon, GL_POINTS, 5);
+            }
+
+            break;
+
         case STOPPED:
-            
+
             break;
         }
 
@@ -335,11 +503,63 @@ int main(void)
     return 0;
 }
 
+void ScaleObject(std::vector<float>& vertices, float elapsedTime) {
+    // Calcula o centro do objeto
+    glm::vec3 center(0.0f);
+    for (size_t i = 0; i < vertices.size(); i += 6) {
+        center.x += vertices[i];
+        center.y += vertices[i + 1];
+        center.z += vertices[i + 2];
+    }
+    center /= (vertices.size() / 6);
+
+    // Calcula o fator de escala baseado no tempo decorrido
+    float scale = 1.0f - (0.1 * elapsedTime);
+
+    // Escala cada ponto em relação ao centro
+    for (size_t i = 0; i < vertices.size(); i += 6) {
+        vertices[i] = center.x + (vertices[i] - center.x) * scale;
+        vertices[i + 1] = center.y + (vertices[i + 1] - center.y) * scale;
+        vertices[i + 2] = center.z + (vertices[i + 2] - center.z) * scale;
+    }
+}
+
+std::vector<float> GeneratePentagon(std::vector<float> points) {
+    glm::vec2 a = glm::vec2(points[0], points[1]);
+    glm::vec2 b = glm::vec2(points[7], points[8]);
+    glm::vec2 c = glm::vec2(points[14], points[15]);
+    glm::vec2 d = glm::vec2(points[21], points[22]);
+    glm::vec2 e = glm::vec2(points[28], points[29]);
+
+    glm::vec2 p1(GetIntersectionPoint(a, e, c, d));
+    glm::vec2 p2(GetIntersectionPoint(a, e, c, b));
+    glm::vec2 p3(GetIntersectionPoint(b, c, e, d));
+    glm::vec2 p4(GetIntersectionPoint(a, b, e, d));
+    glm::vec2 p5(GetIntersectionPoint(a, b, c, d));
+
+    std::vector<float> pentagon = ChangeColor(std::vector<float>({
+        p1.x, p1.y, 0.0f, 0.0f, 0.0f, 0.0f,
+        p2.x, p2.y, 0.0f, 0.0f, 0.0f, 0.0f,
+        p3.x, p3.y, 0.0f, 0.0f, 0.0f, 0.0f,
+        p4.x, p4.y, 0.0f, 0.0f, 0.0f, 0.0f,
+        p5.x, p5.y, 0.0f, 0.0f, 0.0f, 0.0f
+        }), PINK);
+
+    std::cout << "pentagon:" << std::endl;
+    std::cout << pentagon[0] << ", " << pentagon[1] << std::endl;
+    std::cout << pentagon[6] << ", " << pentagon[7] << std::endl;
+    std::cout << pentagon[12] << ", " << pentagon[13] << std::endl;
+    std::cout << pentagon[18] << ", " << pentagon[19] << std::endl;
+    std::cout << pentagon[24] << ", " << pentagon[20] << "\n" << std::endl;
+
+    return pentagon;
+}
+
 void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool& spinning, float& startTime)
 {
     float bounce = glm::abs(glm::sin(elapsedTime * 4.0f));
 
-    for (int i = 1; i < 32; i += 6)
+    for (int i = 1; i < points.size(); i += 6)
     {
         points[i] += bounce * 0.2f; // Adjust y-coordinate of Bottom left
     }
@@ -351,11 +571,11 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
     direction = (direction < 0) ? -1.0f : 1.0f;
 
     // Calculate the rotation angle based on the direction
-    
+
     float angle = elapsedTime * direction * -50.0f; // Spinning speed with direction
-   
+
     if (direction == -1) {
-        angle += 198;
+        angle += 190;
         if (angle >= 360) angle -= 360;
     }
 
@@ -530,9 +750,61 @@ std::tuple<std::vector<float>, std::vector<float>, std::vector<float>> GetTriang
     return std::make_tuple(l1, l2, l3);
 }
 
-std::vector<float> ChangeColor(std::vector<float> points, int nVertex, float r, float g, float b) {
+std::vector<float> ChangeColor(std::vector<float> points, Color color) {
     // Determine o tamanho do bloco (6 ou 7) dependendo se "a" existe
     size_t blockSize = (points.size() % 7 == 0) ? 7 : 6;
+
+    float r, g, b;
+
+    switch (color) {
+    case YELLOW:
+        r = 0.0f;
+        g = 1.0f;
+        b = 1.0f;
+        break;
+
+    case LIGHTPINK:
+        r = 1.0f;
+        g = 0.21484375f;
+        b = 0.62890625f;
+        break;
+
+    case PINK:
+        r = 0.7890625f;
+        g = 0.01953125f;
+        b = 0.453125f;
+        break;
+
+    case LIGHTORANGE:
+        r = 1.0f;
+        g = 0.658823f;
+        b = 0.490196f;
+        break;
+
+    case ORANGE:
+        r = 0.52549f;
+        g = 0.0470588f;
+        b = 0.0f;
+        break;
+
+    case DARKORANGE:
+        r = 0.741176f;
+        g = 0.1215686f;
+        b = 0.0f;
+        break;
+
+    case LIGHTBLUE:
+        r = 0.635294f;
+        g = 0.745098f;
+        b = 0.9254902f;
+        break;
+
+    case BLUE:
+        r = 0.0274509f;
+        g = 0.22745f;
+        b = 0.7803921f;
+        break;
+    }
 
     // Itera sobre o vetor ajustando as posições de r, g, b
     for (size_t i = 3; i < points.size(); i += blockSize) {
@@ -591,7 +863,6 @@ glm::vec3 CalculateCenter(const std::vector<float>& vertices) {
     return center;
 }
 
-
 // Function to generate the points of the star
 std::vector<float> generatePentagram(float radius, glm::vec2 center) {
     std::vector<float> points;
@@ -603,7 +874,7 @@ std::vector<float> generatePentagram(float radius, glm::vec2 center) {
 
     // Gerar os pontos normalmente
     for (int i = 0; i < numPoints; ++i) {
-        float angle = i * angleIncrement + PI/2; // Começar no topo (-PI/2 radianos)
+        float angle = i * angleIncrement + PI / 2; // Começar no topo (-PI/2 radianos)
         float x = center.x + radius * cos(angle);
         float y = center.y + radius * sin(angle);
         tempPoints[i] = glm::vec2(x, y);
@@ -623,7 +894,7 @@ std::vector<float> generatePentagram(float radius, glm::vec2 center) {
 }
 
 std::vector<float> GenerateRectangle(std::vector<float> l1, std::vector<float> l2, std::vector<float> l3) {
-    
+
     std::vector<float> points = {
     l1[0], l1[1], l1[2], 1.0f, 0.21484375f, 0.62890625f, // top left
     l1[6], l1[7], l1[8], 1.0f, 0.21484375f, 0.62890625f, // top right
