@@ -1,0 +1,40 @@
+<<<<<<< HEAD
+﻿  Main.cpp
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(79,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(213,27): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(401,20): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(427,115): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(427,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(428,115): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(428,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(444,24): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(720,87): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(758,83): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(895,87): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(898,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(900,87): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(930,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(964,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(990,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(1153,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(1164,13): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(1415,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244: 'argument': conversion from 'U' to 'T', possible loss of data
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         with
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         [
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:             U=unsigned __int64
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         ]
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         and
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         [
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:             T=float
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Vendor\glm\detail\type_vec3.inl(292,108): warning C4244:         ]
+  shaderFunctions.cpp
+  Generating Code...
+=======
+﻿  Application.cpp
+C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Application.cpp(297,9): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+>>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
+  Project1.vcxproj -> C:\Users\luiza\compGraf\learningOpenGL\firstProject\x64\Debug\Project1.exe
