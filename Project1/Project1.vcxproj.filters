@@ -15,30 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClCompile Include="src\Application.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="src\New.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-=======
->>>>>>> master
     <ClCompile Include="src\Main.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="src\shaderFunctions.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="src\New.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\star.shader" />
-<<<<<<< HEAD
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
-=======
-    <None Include=".gitignore" />
->>>>>>> master
   </ItemGroup>
 </Project>

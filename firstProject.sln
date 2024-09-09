@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-﻿
->>>>>>> master
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
@@ -31,8 +27,4 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17EF142E-5AD3-4126-AA7D-AE965749EFF6}
 	EndGlobalSection
-<<<<<<< HEAD
 EndGlobal
-=======
-EndGlobal
->>>>>>> master
