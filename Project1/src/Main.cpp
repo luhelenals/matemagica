@@ -31,11 +31,7 @@ enum State {
     TRIANGLE,
     MAKINGTRIANGLE,
     STOPPED,
-<<<<<<< HEAD
     PENTAGON,
-=======
-    PENTAGON, 
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     MOVINGTRIANGLES,
     MAKINGTRIRECTANGLES,
     TRIRECTANGLES,
@@ -51,21 +47,13 @@ enum Color {
     DARKORANGE,
     LIGHTBLUE,
     BLUE,
-<<<<<<< HEAD
     DARKBLUE,
     RED
-=======
-    DARKBLUE
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 };
 
 void Bounce(std::vector<float>& points, float elapsedTime, bool& bouncing, bool& spinning, float& startTime);
 void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::vec3 center);
-<<<<<<< HEAD
 void CreateDetachingLines(float x1, float x2, float y1, float y2);
-=======
-void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 void DrawDetachedLines(GLuint& linesVBO, GLuint& linesVAO, GLuint shader, const std::vector<float>& detachedLinesPoints);
 void MoveLineToPosition(std::vector<float>& detachedLinesPoints, int i, float targetX1, float targetX2, float targetY1, float targetY2, float step);
 void Rotate(std::vector<float>& object1, std::vector<float>& object2, float elapsedTime, glm::vec3 center1, glm::vec3 center2);
@@ -83,18 +71,11 @@ std::vector<float> GeneratePentagon(std::vector<float> points);
 std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vector<float>, std::vector<float>> GetPoints(std::vector<float>& points);
 void MoveObjectAwayFromCenter(std::vector<float>& points, float elapsedTime);
 std::vector<float> GenerateFilledPentagon(std::vector<float> points);
-<<<<<<< HEAD
 
 float CalculateRadius(const std::vector<float>& points);
 float CalculateDistance(float x1, float y1, float x2, float y2);
 
 State currentState = BOUNCING; // Start with bouncing
-=======
-float CalculateRadius(const std::vector<float>& points);
-float CalculateDistance(float x1, float y1, float x2, float y2);
-
-State currentState = PENTAGON; // Start with bouncing
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 float stateStartTime = glfwGetTime(); // Track when the current state started
 std::vector<float> detachedLinesPoints;
 
@@ -109,11 +90,7 @@ int main(void)
     glGetFloatv(GL_LINE_WIDTH_RANGE, lineWidthRange);
 
     ShaderProgramSource source = ParseShader("res/shaders/star.shader");
-<<<<<<< HEAD
     unsigned int shader = createShader(source.VertexSource, source.FragmentSource);
-=======
-    unsigned int shader = createShader(source.VertexSource, source.FragmentSource, source.GeometrySource);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 
     GLuint vao, vbo;
 
@@ -149,10 +126,7 @@ int main(void)
     bool hasSeparated = false;
     bool hasMiniRectangled = false;
     float step = 0.0015f;
-<<<<<<< HEAD
     int qtdLines = 0;
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     int i = 1;
 
     float endTime = 0.0f;
@@ -172,11 +146,7 @@ int main(void)
 
     std::vector<float> miniT0 = tri0, miniT1 = tri1, miniT2 = tri2, miniT3 = tri3, miniT4 = tri4;
 
-<<<<<<< HEAD
     l01.resize(12);
-=======
-    l01.resize(12); 
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     l02.resize(12);
     l03.resize(12);
     l11.resize(12);
@@ -188,11 +158,7 @@ int main(void)
     l31.resize(12);
     l32.resize(12);
     l33.resize(12);
-<<<<<<< HEAD
     l41.resize(12);
-=======
-    l41.resize(12); 
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     l42.resize(12);
     l43.resize(12);
 
@@ -224,11 +190,7 @@ int main(void)
             l2 = line2;
             l3 = line3;
         }
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
         std::tie(triangleDC1, triangleAB2, triangleAE3) = GetTriangles(points);
         std::vector<float> t1 = triangleDC1, t2 = triangleDC1, t3 = triangleDC1;
         std::vector<float> miniR0, miniR1, miniR2, miniR3, miniR4;
@@ -239,33 +201,6 @@ int main(void)
         miniR4 = GenerateRectangle(l41, l42, l43);
         std::vector<float> miniR01 = miniR0, miniR11 = miniR1, miniR21 = miniR2, miniR31 = miniR3, miniR41 = miniR4;
 
-<<<<<<< HEAD
-=======
-        /*std::cout << "Ls:" << std::endl;
-        std::cout << l01[0] << ", " << l01[1] << ", " << l01[6] << ", " << l01[7] << std::endl;
-        std::cout << l11[0] << ", " << l11[1] << ", " << l11[6] << ", " << l11[7] << std::endl;
-        std::cout << l21[0] << ", " << l21[1] << ", " << l21[6] << ", " << l21[7] << std::endl;
-        std::cout << l31[0] << ", " << l31[1] << ", " << l31[6] << ", " << l31[7] << std::endl;
-        std::cout << l41[0] << ", " << l41[1] << ", " << l41[6] << ", " << l41[7] << std::endl;
-
-        std::cout << " =============================================================================== " << std::endl;
-
-        std::cout << l02[0] << ", " << l02[1] << ", " << l02[6] << ", " << l02[7] << std::endl;
-        std::cout << l12[0] << ", " << l12[1] << ", " << l12[6] << ", " << l12[7] << std::endl;
-        std::cout << l22[0] << ", " << l22[1] << ", " << l22[6] << ", " << l22[7] << std::endl;
-        std::cout << l32[0] << ", " << l32[1] << ", " << l32[6] << ", " << l32[7] << std::endl;
-        std::cout << l42[0] << ", " << l42[1] << ", " << l42[6] << ", " << l42[7] << std::endl;
-
-        std::cout << " =============================================================================== " << std::endl;
-
-        std::cout << l03[0] << ", " << l03[1] << ", " << l03[6] << ", " << l03[7] << std::endl;
-        std::cout << l13[0] << ", " << l13[1] << ", " << l13[6] << ", " << l13[7] << std::endl;
-        std::cout << l23[0] << ", " << l23[1] << ", " << l23[6] << ", " << l23[7] << std::endl;
-        std::cout << l33[0] << ", " << l33[1] << ", " << l33[6] << ", " << l33[7] << std::endl;
-        std::cout << l43[0] << ", " << l43[1] << ", " << l43[6] << ", " << l43[7] << std::endl;*/
-     
-        
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
         if (hasSeparated && !hasMiniRectangled) {
             std::tie(l01, l02, l03) = GetTriangleLines(tri0);
             std::tie(l11, l12, l13) = GetTriangleLines(tri1);
@@ -289,11 +224,7 @@ int main(void)
             }
             if (elapsedTime >= 4.7f) // Bounce for 5 seconds
             {
-<<<<<<< HEAD
                 //std::cout << "State: BOUNCING" << std::endl;
-=======
-                std::cout << "State: BOUNCING" << std::endl;
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 if (hasSpinned && !hasRectangled)
                     currentState = ROTATING;
 
@@ -322,10 +253,7 @@ int main(void)
             break;
 
         case SPINNING:
-<<<<<<< HEAD
             step = 1;
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             glm::vec3 center = CalculateCenter(points);
             Spin(points, elapsedTime, (spinningForward ? 1.0f : -1.0f), (spinningForward ? center : CalculateCenter(actualPoints)));
             if (elapsedTime >= 10.0f && !spinningForward) // Spin for 6 seconds
@@ -342,7 +270,6 @@ int main(void)
                 stateStartTime = currentTime;
             }
 
-<<<<<<< HEAD
             glm::vec2 a(points[0], points[1]);
             glm::vec2 b(points[6], points[7]);
             glm::vec2 c(points[12], points[13]);
@@ -388,7 +315,7 @@ int main(void)
                     if (qtdLines < 2 && abs(points[24] - points[0]) >= 0.001) {
                         MoveLineToPosition(detachedLinesPoints, 12, points[24], intersection4[0], points[25], intersection4[1], step);
                     }
-                    else if (qtdLines < 2) 
+                    else if (qtdLines < 2)
                     {
                         detachedLinesPoints[15] = 1.0f;
                         detachedLinesPoints[16] = 0.0f;
@@ -438,29 +365,6 @@ int main(void)
             }
             DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
 
-=======
-            if (abs(points[0] - points[6]) <= 0.001 && points[0] > 0.4 && !spinningForward && detachedLinesPoints.size() < 12)
-            {
-                CreateDetachingLines(points, 0, 6, points[1], points[7]);
-            }
-
-            if (abs(points[12] - points[18]) <= 0.001 && points[0] > 0.0 && points[0] < 0.5 && !spinningForward && detachedLinesPoints.size() < 24)
-            {
-                CreateDetachingLines(points, 12, 18, triangleDC1[7], points[13]);
-            }
-
-            if (abs(points[24] - points[0]) <= 0.001 && points[0] > -0.5 && !spinningForward && detachedLinesPoints.size() < 36)
-            {
-                CreateDetachingLines(points, 24, 0, triangleAB2[13], points[25]);
-            }
-
-            if (abs(points[6] - points[12]) <= 0.001 && points[0] < -0.0 && !spinningForward && detachedLinesPoints.size() < 48)
-            {
-                CreateDetachingLines(points, 6, 12, triangleAB2[13], triangleDC1[7]);
-            }
-            DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
-            DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             break;
 
         case IDLE:
@@ -495,7 +399,6 @@ int main(void)
 
         case LINES:
             step = 0.0017;
-<<<<<<< HEAD
             detachedLinesPoints = ChangeColor(detachedLinesPoints, RED);
             if (elapsedTime < 3.0f) {
                 MoveLineToPosition(detachedLinesPoints, 36, detachedLinesPoints[36], detachedLinesPoints[36], detachedLinesPoints[42] / 2 + 0.015f, detachedLinesPoints[1], step);
@@ -508,21 +411,6 @@ int main(void)
             if (elapsedTime > 5.0f && elapsedTime < 7.0f) {
                 MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12] - 0.02f, detachedLinesPoints[12] - 0.02f, detachedLinesPoints[49], detachedLinesPoints[55], step);
                 MoveLineToPosition(detachedLinesPoints, 24, detachedLinesPoints[12] - 0.02f, detachedLinesPoints[12] - 0.02f, detachedLinesPoints[25], detachedLinesPoints[31], step);
-=======
-            if (elapsedTime < 5.0f) {
-                MoveLineToPosition(detachedLinesPoints, 36, detachedLinesPoints[36], detachedLinesPoints[36], detachedLinesPoints[1], detachedLinesPoints[42] / 2 + 0.02, step);
-            }
-            if (abs(detachedLinesPoints[37] - detachedLinesPoints[1]) <= 0.001 && detachedLinesPoints.size() < 60) {
-                CreateDetachingLines(detachedLinesPoints, 36, 42, detachedLinesPoints[37], detachedLinesPoints[43]);
-            }
-            if (elapsedTime > 3.0f && elapsedTime < 5.0f) {
-                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[24], detachedLinesPoints[24], detachedLinesPoints[25], detachedLinesPoints[13], step);
-                frozenPoints = detachedLinesPoints;
-            }
-            if (elapsedTime > 5.0f && elapsedTime < 7.0f) {
-                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12] - 0.02, detachedLinesPoints[12] - 0.02, detachedLinesPoints[49], detachedLinesPoints[55], step);
-                MoveLineToPosition(detachedLinesPoints, 24, detachedLinesPoints[12] - 0.02, detachedLinesPoints[12] - 0.02, detachedLinesPoints[25], detachedLinesPoints[31], step);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             }
             if (elapsedTime > 7.0f && elapsedTime < 9.0f) {
                 MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[48], frozenPoints[48], detachedLinesPoints[49], detachedLinesPoints[55], step);
@@ -532,11 +420,7 @@ int main(void)
                 MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[24], frozenPoints[24], detachedLinesPoints[25], detachedLinesPoints[31], 1);
             }
             if (elapsedTime > 10.0f && elapsedTime < 12.0f) {
-<<<<<<< HEAD
                 MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12], detachedLinesPoints[12], detachedLinesPoints[19], detachedLinesPoints[7], step);
-=======
-                MoveLineToPosition(detachedLinesPoints, 48, detachedLinesPoints[12], detachedLinesPoints[12], detachedLinesPoints[7], detachedLinesPoints[13], step);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 frozenPoints = detachedLinesPoints;
             }
             if (elapsedTime > 12.0f && elapsedTime < 14.0f) {
@@ -547,7 +431,6 @@ int main(void)
                 MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[48], frozenPoints[48], detachedLinesPoints[49], detachedLinesPoints[55], step);
                 MoveLineToPosition(detachedLinesPoints, 12, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], step);
             }
-<<<<<<< HEAD
             if (elapsedTime > 16.0f && elapsedTime < 16.5f) {
                 MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], 1);
                 MoveLineToPosition(detachedLinesPoints, 60, detachedLinesPoints[0], detachedLinesPoints[6], detachedLinesPoints[1], detachedLinesPoints[7], 1);
@@ -556,16 +439,6 @@ int main(void)
                 MoveLineToPosition(detachedLinesPoints, 72, detachedLinesPoints[24], detachedLinesPoints[30], detachedLinesPoints[25], detachedLinesPoints[31], 1);
                 MoveLineToPosition(detachedLinesPoints, 84, detachedLinesPoints[12], detachedLinesPoints[18], detachedLinesPoints[13], detachedLinesPoints[19], 1);
                 MoveLineToPosition(detachedLinesPoints, 96, detachedLinesPoints[24], detachedLinesPoints[30], detachedLinesPoints[25], detachedLinesPoints[31], 1);
-=======
-            if (elapsedTime > 16.0f && detachedLinesPoints.size() < 72) {
-                MoveLineToPosition(detachedLinesPoints, 48, frozenPoints[12], frozenPoints[12], detachedLinesPoints[13], detachedLinesPoints[19], 1);
-                CreateDetachingLines(detachedLinesPoints, 0, 6, detachedLinesPoints[1], detachedLinesPoints[7]);
-            }
-            if (elapsedTime > 16.5f && detachedLinesPoints.size() < 108) {
-                CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
-                CreateDetachingLines(detachedLinesPoints, 12, 18, detachedLinesPoints[13], detachedLinesPoints[19]);
-                CreateDetachingLines(detachedLinesPoints, 24, 30, detachedLinesPoints[25], detachedLinesPoints[31]);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             }
             if (elapsedTime > 17.0f) {
                 step = 0.001;
@@ -580,7 +453,6 @@ int main(void)
                 glm::vec2 intersection5 = GetIntersectionPoint(b, a, d, c);
 
                 MoveLineToPosition(detachedLinesPoints, 0, points[6], points[12], points[7], points[13], step);
-<<<<<<< HEAD
                 MoveLineToPosition(detachedLinesPoints, 12, intersection4[0], points[0], intersection4[1], points[1], step);
                 MoveLineToPosition(detachedLinesPoints, 24, triangleAE3[12], points[18], triangleAE3[13], points[19], step);
                 MoveLineToPosition(detachedLinesPoints, 36, intersection5[0], triangleAE3[12], intersection5[1], triangleAE3[13], step);
@@ -589,16 +461,6 @@ int main(void)
                 MoveLineToPosition(detachedLinesPoints, 72, points[6], triangleAE3[12], points[7], triangleAE3[13], step);
                 MoveLineToPosition(detachedLinesPoints, 84, points[24], intersection4[0], points[25], intersection4[1], step);
                 MoveLineToPosition(detachedLinesPoints, 96, intersection5[0], points[0], intersection5[1], points[1], step);
-=======
-                MoveLineToPosition(detachedLinesPoints, 12, points[0], intersection4[0], points[1], intersection4[1], step);
-                MoveLineToPosition(detachedLinesPoints, 24, points[18], triangleAE3[12], points[19], triangleAE3[13], step);
-                MoveLineToPosition(detachedLinesPoints, 36, triangleAE3[12], intersection5[0], triangleAE3[13], intersection5[1], step);
-                MoveLineToPosition(detachedLinesPoints, 48, triangleAE3[12], points[24], triangleAE3[13], points[25], step);
-                MoveLineToPosition(detachedLinesPoints, 60, points[18], points[12], points[19], points[13], step);
-                MoveLineToPosition(detachedLinesPoints, 72, triangleAE3[12], points[6], triangleAE3[13], points[7], step);
-                MoveLineToPosition(detachedLinesPoints, 84, intersection4[0], points[24], intersection4[1], points[25], step);
-                MoveLineToPosition(detachedLinesPoints, 96, points[0], intersection5[0], points[1], intersection5[1], step);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             }
             if (elapsedTime < 22.0f) {
                 DrawDetachedLines(linesVBO, linesVAO, shader, detachedLinesPoints);
@@ -609,10 +471,7 @@ int main(void)
 
             }
             else {
-<<<<<<< HEAD
                 frozenPoints = points;
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 currentState = ROTATING;
                 stateStartTime = currentTime;
             }
@@ -668,21 +527,6 @@ int main(void)
                     std::cout << "State: TRIANGLE" << std::endl;
                     currentState = hasRectangled ? ROTATING : MAKINGRECTANGLE;
                     stateStartTime = currentTime;
-<<<<<<< HEAD
-=======
-
-                    std::cout << "t2: " << std::endl;
-                    std::cout << t2[0] << ", " << t2[1] << std::endl;
-                    std::cout << t2[6] << ", " << t2[7] << std::endl;
-                    std::cout << t2[12] << ", " << t2[13] << std::endl;
-
-                    std::cout << "t3: " << std::endl;
-                    std::cout << t3[0] << ", " << t3[1] << std::endl;
-                    std::cout << t3[6] << ", " << t3[7] << std::endl;
-                    std::cout << t3[12] << ", " << t3[13] << std::endl;
-
-                    std::cout << "\n" << std::endl;
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 }
             }
 
@@ -715,11 +559,7 @@ int main(void)
                 rectangle = ChangeColor(rectangle, LIGHTORANGE);
                 std::vector<float> rectangle2 = rectangle;
 
-<<<<<<< HEAD
                 float frequency = 10.0f; // Frequência da piscada (alterar conforme desejado)
-=======
-                float frequency = 2.0f; // Frequência da piscada (alterar conforme desejado)
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 float intensity = (sin(elapsedTime * frequency) + 1.0f) / 2.0f;
 
                 if (intensity > 0.5f)
@@ -766,11 +606,7 @@ int main(void)
             points = ChangeColor(points, LIGHTBLUE);
             ScaleObject(points, elapsedTime);
             Bounce(points, elapsedTime, bouncing, spinning, stateStartTime);
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             std::tie(triangleDC1, triangleAB2, triangleAE3) = GetTriangles(points);
             pentagon = GeneratePentagon(points);
             triangleAB2 = ChangeColor(triangleAB2, DARKBLUE);
@@ -788,11 +624,7 @@ int main(void)
                 stateStartTime = currentTime;
                 currentState = STOPPED;
             }
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             break;
 
         case MOVINGTRIANGLES:
@@ -845,11 +677,7 @@ int main(void)
             tri3 = ChangeColor(tri3, LIGHTBLUE);
             tri4 = ChangeColor(tri4, LIGHTBLUE);
             tri0 = ChangeColor(tri0, LIGHTBLUE);
-<<<<<<< HEAD
             pentagon = GeneratePentagon(frozenPoints);
-=======
-
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             DrawShape(vbo, vao, shader, pentagon, GL_LINE_LOOP, 5);
             DrawShape(vbo, vao, shader, tri0, GL_LINE_LOOP, 3);
             DrawShape(vbo, vao, shader, tri1, GL_LINE_LOOP, 3);
@@ -866,21 +694,13 @@ int main(void)
             break;
 
         case MAKINGTRIRECTANGLES:
-<<<<<<< HEAD
 
-=======
-                            
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             Rotate(l02, l01, elapsedTime, glm::vec3(l02[6], l02[7], l02[8]), glm::vec3(l01[6], l01[7], l01[8]));
             Rotate(l11, l12, elapsedTime, glm::vec3(l11[6], l11[7], l11[8]), glm::vec3(l12[6], l12[7], l12[8]));
             Rotate(l21, l22, elapsedTime, glm::vec3(l21[6], l21[7], l21[8]), glm::vec3(l22[6], l22[7], l22[8]));
             Rotate(l31, l32, elapsedTime, glm::vec3(l31[6], l31[7], l31[8]), glm::vec3(l32[6], l32[7], l32[8]));
             Rotate(l41, l42, elapsedTime, glm::vec3(l41[6], l41[7], l41[8]), glm::vec3(l42[6], l42[7], l42[8]));
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             if (abs(l01[0] - l01[6]) > 0.001f)
             {
                 miniT0 = ChangeColor(tri0, BLUE);
@@ -896,10 +716,7 @@ int main(void)
                 DrawShape(vbo, vao, shader, miniT4, GL_TRIANGLES, 3);
 
                 pentagon2 = GenerateFilledPentagon(frozenPoints);
-<<<<<<< HEAD
                 pentagon = GeneratePentagon(frozenPoints);
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 DrawShape(vbo, vao, shader, pentagon2, GL_TRIANGLES, pentagon2.size() / 6);
                 DrawShape(vbo, vao, shader, pentagon, GL_LINE_LOOP, 5);
 
@@ -937,14 +754,9 @@ int main(void)
             }
 
             pentagon2 = GenerateFilledPentagon(frozenPoints);
-<<<<<<< HEAD
             pentagon = GeneratePentagon(frozenPoints); // verificar!!
             DrawShape(vbo, vao, shader, pentagon2, GL_TRIANGLES, pentagon2.size() / 6);
             DrawShape(vbo, vao, shader, pentagon, GL_LINE_LOOP, 5);
-=======
-            DrawShape(vbo, vao, shader, pentagon2, GL_TRIANGLES, pentagon2.size() / 6);
-            DrawShape(vbo, vao, shader, pentagon, GL_LINE_LOOP, 5);                
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 
             miniR0 = ChangeColor(std::vector<float>({
                 l02[0], l02[1], l02[2], 0.0f, 0.0f, 0.0f,
@@ -1014,11 +826,7 @@ int main(void)
                 miniR2 = ChangeColor(miniR2, LIGHTORANGE);
                 miniR3 = ChangeColor(miniR3, LIGHTORANGE);
                 miniR4 = ChangeColor(miniR4, LIGHTORANGE);
-<<<<<<< HEAD
 
-=======
-                    
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             }
             if (elapsedTime < 2.2f) {
                 DrawShape(vbo, vao, shader, miniR4, GL_LINE_LOOP, 6);
@@ -1087,21 +895,13 @@ int main(void)
                 DrawShape(vbo, vao, shader, pentagon2, GL_TRIANGLES, pentagon2.size() / 6);
             }
             else {
-<<<<<<< HEAD
                 float radius = CalculateRadius(pentagon2) / 3.2;
-=======
-                float radius = CalculateRadius(pentagon2)/3.2;
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
                 frozenPoints = generatePentagram(-radius, CalculateCenter(pentagon2));
                 DrawShape(vbo, vao, shader, pentagon2, GL_TRIANGLES, pentagon2.size() / 6);
                 DrawShape(vbo, vao, shader, frozenPoints, GL_LINE_LOOP, 6);
             }
 
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
             //DrawShape(vbo, vao, shader, points, GL_LINE_LOOP, 6);
             break;
         }
@@ -1221,11 +1021,7 @@ std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vect
         p3.x, p3.y, 0.0f, 0.0f, 0.0f, 0.0f,
         p4.x, p4.y, 0.0f, 0.0f, 0.0f, 0.0f
     };
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     std::vector<float> tri2 = {
         points[12], points[13], 0.0f, 0.0f, 0.0f, 0.0f,
         p1.x, p1.y, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -1297,11 +1093,7 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
     float angle = elapsedTime * direction * -50.0f; // Spinning speed with direction
 
     if (direction == -1) {
-<<<<<<< HEAD
         angle -= 89;
-=======
-        angle += 190;
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
         if (angle >= 360) angle -= 360;
     }
 
@@ -1327,11 +1119,7 @@ void Spin(std::vector<float>& points, float elapsedTime, float direction, glm::v
     }
 }
 
-<<<<<<< HEAD
 void CreateDetachingLines(float x1, float x2, float y1, float y2)
-=======
-void CreateDetachingLines(std::vector<float>& points, int point1, int point2, float y1, float y2)
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 {
     // Only create a line after enough time has passed.
     if (detachedLinesPoints.size() < 30 * 6) // Assume 5 lines with 6 vertices each
@@ -1339,16 +1127,9 @@ void CreateDetachingLines(std::vector<float>& points, int point1, int point2, fl
         // Create a vertical line segment at the star's current position.
         detachedLinesPoints.insert(detachedLinesPoints.end(),
             {
-<<<<<<< HEAD
                 x1, y1, 0.0f, 1.0f, 1.0f, 1.0f, // First vertex of the line
                 x2, y2, 0.0f, 1.0f, 1.0f, 1.0f  // Second vertex of the line
             });
-=======
-                points[point1], y1, 0.0f, 1.0f, 1.0f, 1.0f, // First vertex of the line
-                points[point2], y2, 0.0f, 1.0f, 1.0f, 1.0f  // Second vertex of the line
-            });
-        detachedLinesPoints = ChangeColor(detachedLinesPoints, DARKORANGE);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     }
 }
 
@@ -1380,10 +1161,7 @@ void MoveLineToPosition(std::vector<float>& detachedLinesPoints, int i,
     float targetX1, float targetX2, float targetY1, float targetY2,
     float step)
 {
-<<<<<<< HEAD
     step += 0.008;
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     // Calculate the distance to move on each axis for the first point
     float deltaX1 = (targetX1 - detachedLinesPoints[i]) * step;
     float deltaY1 = (targetY1 - detachedLinesPoints[i + 1]) * step;
@@ -1529,15 +1307,9 @@ std::vector<float> ChangeColor(std::vector<float> points, Color color) {
 
     switch (color) {
     case YELLOW:
-<<<<<<< HEAD
         r = 1.0f;
         g = 1.0f;
         b = 0.0f;
-=======
-        r = 0.0f;
-        g = 1.0f;
-        b = 1.0f;
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
         break;
 
     case LIGHTPINK:
@@ -1581,25 +1353,18 @@ std::vector<float> ChangeColor(std::vector<float> points, Color color) {
         g = 0.32941176f;
         b = 0.921568f;
         break;
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     case DARKBLUE:
         r = 0.0274509f;
         g = 0.22745f;
         b = 0.7803921f;
         break;
-<<<<<<< HEAD
 
     case RED:
         r = 1.0f;
         g = 0.0f;
         b = 0.0f;
         break;
-=======
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
     }
 
     // Itera sobre o vetor ajustando as posições de r, g, b
@@ -1691,7 +1456,6 @@ std::vector<float> generatePentagram(float radius, glm::vec2 center) {
 
 std::vector<float> GenerateRectangle(std::vector<float> l1, std::vector<float> l2, std::vector<float> l3) {
 
-<<<<<<< HEAD
     std::vector<float> points = {
     l1[0], l1[1], l1[2], 1.0f, 0.21484375f, 0.62890625f, // top left
     l1[6], l1[7], l1[8], 1.0f, 0.21484375f, 0.62890625f, // top right
@@ -1701,17 +1465,6 @@ std::vector<float> GenerateRectangle(std::vector<float> l1, std::vector<float> l
     l2[6], l2[7], l2[8], 1.0f, 0.21484375f, 0.62890625f,  // bottom left
     l1[0], l1[1], l1[2], 1.0f, 0.21484375f, 0.62890625f, // top left
     };
-=======
-    std::vector<float> points = ChangeColor(std::vector<float>({
-        l1[0], l1[1], l1[2], 0.0f, 0.0f, 0.0f, // top left
-        l1[6], l1[7], l1[8], 0.0f, 0.0f, 0.0f, // top right
-        l3[6], l3[7], l3[8], 0.0f, 0.0f, 0.0f, // bottom right
-
-        l3[6], l3[7], l3[8], 0.0f, 0.0f, 0.0f, // bottom right
-        l2[6], l2[7], l2[8], 0.0f, 0.0f, 0.0f,  // bottom left
-        l1[0], l1[1], l1[2], 0.0f, 0.0f, 0.0f, // top left
-        }), LIGHTPINK);
->>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
 
     return points;
 }

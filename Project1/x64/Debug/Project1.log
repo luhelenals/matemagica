@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿  Main.cpp
 C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(79,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\luiza\compGraf\learningOpenGL\firstProject\Project1\src\Main.cpp(213,27): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
@@ -38,3 +39,6 @@ LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; us
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
 >>>>>>> 7537bd658c6f3a2b5a2080cc93f14f916254bc56
   Project1.vcxproj -> C:\Users\luiza\compGraf\learningOpenGL\firstProject\x64\Debug\Project1.exe
+=======
+﻿  Project1.vcxproj -> C:\Users\luiza\compGraf\learningOpenGL\firstProject\x64\Debug\Project1.exe
+>>>>>>> master
